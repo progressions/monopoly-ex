@@ -153,7 +153,7 @@ defmodule MonopolyTest do
   end
 
   test "find_player when the player doesn't exist", state do
-    # assert Monopoly.find_player(state.game.players, "dubu") == {nil, nil}
+    assert_raise RuntimeError, "Player dubu does not exist in [nayeon, tzuyu, momo]", fn () -> Monopoly.find_player(state.game.players, "dubu") == {nil, nil} end
   end
 
   test "add_money", state do

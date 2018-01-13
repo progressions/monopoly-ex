@@ -165,7 +165,12 @@ defmodule Monopoly do
   def find_player([%Player{name: name} = player|_], name, acc), do: {acc, player}
   def find_player([_|tail], name), do: find_player(tail, name)
   def find_player([], name, _), do: raise "Player #{name} does not exist in []"
-  def find_player(players, name, _), do: raise "Player #{name} does not exist in #{Enum.join(players, ", ")}"
+  def find_player(players, name, _) do
+    names = players
+            |> Enum.map(&(&1.name))
+            |> Enum.join(", ")
+    raise "Player #{name} does not exist in [#{names}]"
+  end
 
   def player_index(board, player), do: player_index(board, player, 0)
   def player_index([space], player, index) do
