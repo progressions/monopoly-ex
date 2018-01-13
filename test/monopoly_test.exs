@@ -139,8 +139,16 @@ defmodule MonopolyTest do
     assert game.history == ["nayeon lands on Go", "nayeon passes Go", "nayeon moves 4 spaces"]
   end
 
-  test "find_player" do
+  test "find_player_on_board" do
     game = Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-    assert Monopoly.find_player(game, "nayeon") == %Monopoly.Space{name: "Mediterranean Ave", players: ["nayeon"]}
+    assert Monopoly.find_player_on_board(game, "nayeon") == %Monopoly.Space{name: "Mediterranean Ave", players: ["nayeon"]}
+  end
+
+  test "find_player", state do
+    assert Monopoly.find_player(state.game.players, "nayeon") == %Player{money: 1500, name: "nayeon"}
+  end
+
+  test "find_player when the player doesn't exist", state do
+    assert Monopoly.find_player(state.game.players, "dubu") == nil
   end
 end

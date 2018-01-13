@@ -28,6 +28,7 @@ defmodule Monopoly do
   defmodule Player do
     defstruct [
       :name,
+      money: 1500,
     ]
   end
 
@@ -83,7 +84,7 @@ defmodule Monopoly do
   end
 
   def move_player(game, player, spaces: 0) do
-    space = find_player(game, player)
+    space = find_player_on_board(game, player)
 
     game
     |> log("#{player} lands on #{space.name}")
@@ -106,14 +107,17 @@ defmodule Monopoly do
     |> Monopoly.assign_to_space(player, to)
   end
 
-  def traverse(game, player, to) do
+  def traverse(game, player, to) when is_integer(to) do
     space = space_at(game, to)
+    traverse(game, player, space)
+  end
+  def traverse(game, player, %Space{type: :go}) do
+    log(game, "#{player} passes Go")
+  end
+  def traverse(game, _player, _), do: game
 
-    if space.type == :go do
-      log(game, "#{player} passes Go")
-    else
-      game
-    end
+  def add_money(game, player, amount) do
+
   end
 
   def space_at(game, index) do
@@ -147,10 +151,14 @@ defmodule Monopoly do
     end
   end
 
-  def find_player(game, player) do
+  def find_player_on_board(game, player) do
     index = player_index(game.board, player)
     space_at(game, index)
   end
+
+  def find_player([%Player{name: name} = player|_], name), do: player
+  def find_player([_|tail], name), do: find_player(tail, name)
+  def find_player(_, name), do: nil
 
   def player_index(board, player), do: player_index(board, player, 0)
   def player_index([space], player, index) do
