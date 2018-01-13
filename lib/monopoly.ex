@@ -73,7 +73,7 @@ defmodule Monopoly do
 
   def next_player(%Game{players: [first|_]}), do: first
 
-  def roll_dice do
+  defp roll_dice do
     :rand.uniform(6) + :rand.uniform(6)
   end
 
@@ -107,17 +107,22 @@ defmodule Monopoly do
     |> Monopoly.assign_to_space(player, to)
   end
 
-  def traverse(game, player, to) when is_integer(to) do
+  def traverse(game, name, to) when is_integer(to) do
     space = space_at(game, to)
-    traverse(game, player, space)
+    traverse(game, name, space)
   end
-  def traverse(game, player, %Space{type: :go}) do
-    log(game, "#{player} passes Go")
+  def traverse(game, name, %Space{type: :go}) do
+    game
+    |> add_money(name, 200)
+    |> log("#{name} passes Go, collects $200")
   end
   def traverse(game, _player, _), do: game
 
-  def add_money(game, player, amount) do
+  def add_money(game, name, amount) do
+    {index, _player} = find_player(game.players, name)
+    players = List.update_at(game.players, index, fn (p) -> %{p | money: p.money+amount} end)
 
+    %{game | players: players}
   end
 
   def space_at(game, index) do
@@ -156,9 +161,11 @@ defmodule Monopoly do
     space_at(game, index)
   end
 
-  def find_player([%Player{name: name} = player|_], name), do: player
+  def find_player(players, name), do: find_player(players, name, 0)
+  def find_player([%Player{name: name} = player|_], name, acc), do: {acc, player}
   def find_player([_|tail], name), do: find_player(tail, name)
-  def find_player(_, name), do: nil
+  def find_player([], name, _), do: raise "Player #{name} does not exist in []"
+  def find_player(players, name, _), do: raise "Player #{name} does not exist in #{Enum.join(players, ", ")}"
 
   def player_index(board, player), do: player_index(board, player, 0)
   def player_index([space], player, index) do

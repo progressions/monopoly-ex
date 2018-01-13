@@ -107,11 +107,10 @@ defmodule MonopolyTest do
       %Monopoly.Space{name: "Connecticut Ave", players: ["nayeon"]}]
   end
 
-  test "move player spaces wrap around" do
-    game = Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-           |> Monopoly.move_player("nayeon", spaces: 4)
+  test "move player spaces wrap around", state do
+    game = Monopoly.move_player(state.game, "nayeon", spaces: 5)
 
-    assert game.board == [%Monopoly.Space{name: "Go", players: ["nayeon"], type: :go},
+    assert game.board == [%Monopoly.Space{name: "Go", players: ["nayeon", "momo", "tzuyu"], type: :go},
       %Monopoly.Space{name: "Mediterranean Ave", players: []},
       %Monopoly.Space{name: "Baltic Ave", players: []},
       %Monopoly.Space{name: "Vermont Ave", players: []},
@@ -126,17 +125,22 @@ defmodule MonopolyTest do
     assert Monopoly.player_index(game.board, "nayeon") == 3
   end
 
-  test "perform_move" do
-    game = Monopoly.assign_to_space(%Game{}, "nayeon", 1)
+  test "perform_move", state do
+    game = Monopoly.assign_to_space(state.game, "nayeon", 1)
            |> Monopoly.perform_move("nayeon", spaces: 4)
 
-    assert game.board == [%Monopoly.Space{name: "Go", players: ["nayeon"], type: :go},
-      %Monopoly.Space{name: "Mediterranean Ave", players: []},
-      %Monopoly.Space{name: "Baltic Ave", players: []},
-      %Monopoly.Space{name: "Vermont Ave", players: []},
-      %Monopoly.Space{name: "Connecticut Ave", players: []}]
+    assert game.board == [%Monopoly.Space{name: "Go", type: :go, players: ["momo", "tzuyu"]}, %Monopoly.Space{name: "Mediterranean Ave", players: [], type: nil}, %Monopoly.Space{name: "Baltic Ave", type: nil, players: ["nayeon"]}, %Monopoly.Space{name: "Vermont Ave", type: nil, players: ["nayeon"]}, %Monopoly.Space{name: "Connecticut Ave", players: [], type: nil}]
+    assert game.history == ["nayeon lands on Baltic Ave", "nayeon moves 4 spaces", "Game begins with nayeon, tzuyu, momo!"]
+  end
 
-    assert game.history == ["nayeon lands on Go", "nayeon passes Go", "nayeon moves 4 spaces"]
+  test "passes Go", state do
+    game = Monopoly.perform_move(state.game, "nayeon", spaces: 6)
+    assert game.history == ["nayeon lands on Mediterranean Ave",
+      "nayeon passes Go, collects $200", "nayeon moves 6 spaces",
+      "Game begins with nayeon, tzuyu, momo!"]
+    assert game.players == [%Monopoly.Player{money: 1700, name: "nayeon"},
+      %Monopoly.Player{money: 1500, name: "tzuyu"},
+      %Monopoly.Player{money: 1500, name: "momo"}]
   end
 
   test "find_player_on_board" do
@@ -145,10 +149,17 @@ defmodule MonopolyTest do
   end
 
   test "find_player", state do
-    assert Monopoly.find_player(state.game.players, "nayeon") == %Player{money: 1500, name: "nayeon"}
+    assert Monopoly.find_player(state.game.players, "nayeon") == {0, %Player{money: 1500, name: "nayeon"}}
   end
 
   test "find_player when the player doesn't exist", state do
-    assert Monopoly.find_player(state.game.players, "dubu") == nil
+    # assert Monopoly.find_player(state.game.players, "dubu") == {nil, nil}
+  end
+
+  test "add_money", state do
+    game = Monopoly.add_money(state.game, "nayeon", 200)
+    assert game.players == [%Monopoly.Player{money: 1700, name: "nayeon"},
+      %Monopoly.Player{money: 1500, name: "tzuyu"},
+      %Monopoly.Player{money: 1500, name: "momo"}]
   end
 end
