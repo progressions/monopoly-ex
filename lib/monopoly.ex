@@ -6,6 +6,7 @@ defmodule Monopoly do
   defmodule Space do
     defstruct [
       :name,
+      :type,
       players: [],
     ]
   end
@@ -14,7 +15,7 @@ defmodule Monopoly do
     defstruct [
       players: [],
       board: [
-        %Space{name: "Go"},
+        %Space{name: "Go", type: :go},
         %Space{name: "Mediterranean Ave"},
         %Space{name: "Baltic Ave"},
         %Space{name: "Vermont Ave"},
@@ -37,7 +38,7 @@ defmodule Monopoly do
 
       iex> Monopoly.init(players: ["Isaac", "Darla"])
       %Monopoly.Game{board: [%Monopoly.Space{name: "Go",
-          players: ["Darla", "Isaac"]},
+        players: ["Darla", "Isaac"], type: :go},
          %Monopoly.Space{name: "Mediterranean Ave", players: []},
          %Monopoly.Space{name: "Baltic Ave", players: []},
          %Monopoly.Space{name: "Vermont Ave", players: []},
@@ -75,19 +76,44 @@ defmodule Monopoly do
     :rand.uniform(6) + :rand.uniform(6)
   end
 
+  def perform_move(game, player, spaces: spaces) do
+    game
+    |> log("#{player} moves #{spaces} spaces")
+    |> move_player(player, spaces: spaces)
+  end
+
+  def move_player(game, player, spaces: 0) do
+    space = find_player(game, player)
+
+    game
+    |> log("#{player} lands on #{space.name}")
+  end
   def move_player(game, player, spaces: spaces) do
-    from = find_player(game.board, player)
-    to = destination_index(game.board, from, spaces)
+    from = player_index(game.board, player)
+    to = destination_index(game.board, from, 1)
+
     move_player(game, player, from: from, to: to)
+    |> traverse(player, to)
+    |> move_player(player, spaces: spaces-1)
   end
   def move_player(game, player, to: to) do
-    from = find_player(game.board, player)
+    from = player_index(game.board, player)
     move_player(game, player, from: from, to: to)
   end
   def move_player(game, player, from: from, to: to) do
     game
     |> Monopoly.remove_from_space(player, from)
     |> Monopoly.assign_to_space(player, to)
+  end
+
+  def traverse(game, player, to) do
+    space = space_at(game, to)
+
+    if space.type == :go do
+      log(game, "#{player} passes Go")
+    else
+      game
+    end
   end
 
   def space_at(game, index) do
@@ -121,12 +147,17 @@ defmodule Monopoly do
     end
   end
 
-  def find_player(board, player), do: find_player(board, player, 0)
-  def find_player([space], player, index) do
+  def find_player(game, player) do
+    index = player_index(game.board, player)
+    space_at(game, index)
+  end
+
+  def player_index(board, player), do: player_index(board, player, 0)
+  def player_index([space], player, index) do
     if player in space.players, do: index, else: nil
   end
-  def find_player([space|tail], player, index) do
-    if player in space.players, do: index, else: find_player(tail, player, index+1)
+  def player_index([space|tail], player, index) do
+    if player in space.players, do: index, else: player_index(tail, player, index+1)
   end
 
   def assign_to_space(game, player, space) do
