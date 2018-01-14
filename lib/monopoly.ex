@@ -6,7 +6,7 @@ defmodule Monopoly do
   defmodule Space do
     defstruct [
       :name,
-      :type,
+      type: :property,
       players: []
     ]
   end
@@ -14,11 +14,46 @@ defmodule Monopoly do
   defmodule Game do
     defstruct players: [],
               board: [
-                %Space{name: "Go", type: :go},
-                %Space{name: "Mediterranean Ave"},
-                %Space{name: "Baltic Ave"},
-                %Space{name: "Vermont Ave"},
-                %Space{name: "Connecticut Ave"}
+                %Space{name: "Go (collect $200)", type: :go},
+                %Space{name: "Mediterranean Avenue"},
+                %Space{name: "Community Chest", type: :community_chest},
+                %Space{name: "Baltic Avenue"},
+                %Space{name: "Income Tax (pay $200)", type: :income_tax},
+                %Space{name: "Reading Railroad"},
+                %Space{name: "Oriental Avenue"},
+                %Space{name: "Chance", type: :chance},
+                %Space{name: "Vermont Avenue"},
+                %Space{name: "Connecticut Avenue"},
+                %Space{name: "In Jail/Just Visiting", type: :jail},
+                %Space{name: "St. Charles Place"},
+                %Space{name: "Electric Company"},
+                %Space{name: "States Avenue"},
+                %Space{name: "Virginia Avenue"},
+                %Space{name: "Pennsylvania Railroad"},
+                %Space{name: "St. James Place"},
+                %Space{name: "Community Chest", type: :community_chest},
+                %Space{name: "Tennessee Avenue"},
+                %Space{name: "New York Avenue"},
+                %Space{name: "Free Parking", type: :free_parking},
+                %Space{name: "Kentucky Avenue"},
+                %Space{name: "Chance", type: :chance},
+                %Space{name: "Indiana Avenue"},
+                %Space{name: "Illinois Avenue"},
+                %Space{name: "B&O Railroad"},
+                %Space{name: "Atlantic Avenue"},
+                %Space{name: "Ventnor Avenue"},
+                %Space{name: "Water Works"},
+                %Space{name: "Marvin Gardens"},
+                %Space{name: "Go to Jail", type: :go_to_jail},
+                %Space{name: "Pacific Avenue"},
+                %Space{name: "North Carolina Avenue"},
+                %Space{name: "Community Chest", type: :community_chest},
+                %Space{name: "Pennsylvania Avenue"},
+                %Space{name: "Short Line"},
+                %Space{name: "Chance", type: :chance},
+                %Space{name: "Park Place"},
+                %Space{name: "Luxury Tax (pay $100)", type: :luxury_tax},
+                %Space{name: "Boardwalk"}
               ],
               history: []
   end
@@ -34,17 +69,6 @@ defmodule Monopoly do
   Initialize a new game with a set of players.
 
   ## Examples
-
-      iex> Monopoly.init(players: ["Isaac", "Darla"])
-      %Monopoly.Game{board: [%Monopoly.Space{name: "Go",
-        players: ["Darla", "Isaac"], type: :go},
-         %Monopoly.Space{name: "Mediterranean Ave", players: []},
-         %Monopoly.Space{name: "Baltic Ave", players: []},
-         %Monopoly.Space{name: "Vermont Ave", players: []},
-         %Monopoly.Space{name: "Connecticut Ave", players: []}],
-        history: ["Game begins with Isaac, Darla!"],
-        players: [%Monopoly.Player{name: "Isaac"},
-         %Monopoly.Player{name: "Darla"}]}
 
   """
   @spec init(players: list) :: struct
@@ -168,7 +192,6 @@ defmodule Monopoly do
 
   def find_player(players, name), do: find_player(players, name, 0)
   def find_player([%Player{name: name} = player | _], name, acc), do: {acc, player}
-  def find_player([_ | tail], name), do: find_player(tail, name)
   def find_player([], name, _), do: raise("Player #{name} does not exist in []")
 
   def find_player(players, name, _) do

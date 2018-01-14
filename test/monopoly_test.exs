@@ -13,41 +13,28 @@ defmodule MonopolyTest do
   test "plays a game", state do
     game = state.game
 
-    assert game == %Game{
-             board: [
-               %Space{name: "Go", players: ["momo", "tzuyu", "nayeon"], type: :go},
-               %Space{name: "Mediterranean Ave", players: []},
-               %Space{name: "Baltic Ave", players: []},
-               %Space{name: "Vermont Ave", players: []},
-               %Space{name: "Connecticut Ave", players: []}
-             ],
-             history: ["Game begins with nayeon, tzuyu, momo!"],
-             players: [%Player{name: "nayeon"}, %Player{name: "tzuyu"}, %Player{name: "momo"}]
-           }
+    assert game.history == ["Game begins with nayeon, tzuyu, momo!"]
+
+    assert game.players == [
+             %Player{name: "nayeon"},
+             %Player{name: "tzuyu"},
+             %Player{name: "momo"}
+           ]
   end
 
   test "assign to space 1" do
     game = Monopoly.assign_to_space(%Game{}, "nayeon", 1)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", players: [], type: :go},
-             %Monopoly.Space{name: "Mediterranean Ave", players: ["nayeon"]},
-             %Monopoly.Space{name: "Baltic Ave", players: []},
-             %Monopoly.Space{name: "Vermont Ave", players: []},
-             %Monopoly.Space{name: "Connecticut Ave", players: []}
-           ]
+    assert Enum.at(game.board, 1).players == ["nayeon"]
+    assert Enum.at(game.board, 1).name == "Mediterranean Avenue"
   end
 
   test "assign to space 2" do
     game = Monopoly.assign_to_space(%Game{}, "nayeon", 2)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", players: [], type: :go},
-             %Monopoly.Space{name: "Mediterranean Ave", players: []},
-             %Monopoly.Space{name: "Baltic Ave", players: ["nayeon"]},
-             %Monopoly.Space{name: "Vermont Ave", players: []},
-             %Monopoly.Space{name: "Connecticut Ave", players: []}
-           ]
+    assert Enum.at(game.board, 0).players == []
+    assert Enum.at(game.board, 2).players == ["nayeon"]
+    assert Enum.at(game.board, 2).name == "Community Chest"
   end
 
   test "assign to space 3" do
@@ -55,13 +42,9 @@ defmodule MonopolyTest do
       Monopoly.assign_to_space(%Game{}, "nayeon", 1)
       |> Monopoly.assign_to_space("nayeon", 2)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", players: [], type: :go},
-             %Monopoly.Space{name: "Mediterranean Ave", players: ["nayeon"]},
-             %Monopoly.Space{name: "Baltic Ave", players: ["nayeon"]},
-             %Monopoly.Space{name: "Vermont Ave", players: []},
-             %Monopoly.Space{name: "Connecticut Ave", players: []}
-           ]
+    assert Enum.at(game.board, 1).players == ["nayeon"]
+    assert Enum.at(game.board, 2).players == ["nayeon"]
+    assert Enum.at(game.board, 2).name == "Community Chest"
   end
 
   test "remove from space 1" do
@@ -70,13 +53,9 @@ defmodule MonopolyTest do
       |> Monopoly.remove_from_space("nayeon", 1)
       |> Monopoly.assign_to_space("nayeon", 2)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", players: [], type: :go},
-             %Monopoly.Space{name: "Mediterranean Ave", players: []},
-             %Monopoly.Space{name: "Baltic Ave", players: ["nayeon"]},
-             %Monopoly.Space{name: "Vermont Ave", players: []},
-             %Monopoly.Space{name: "Connecticut Ave", players: []}
-           ]
+    assert Enum.at(game.board, 1).players == []
+    assert Enum.at(game.board, 2).players == ["nayeon"]
+    assert Enum.at(game.board, 2).name == "Community Chest"
   end
 
   test "move player from to" do
@@ -84,13 +63,9 @@ defmodule MonopolyTest do
       Monopoly.assign_to_space(%Game{}, "nayeon", 1)
       |> Monopoly.move_player("nayeon", from: 1, to: 2)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", players: [], type: :go},
-             %Monopoly.Space{name: "Mediterranean Ave", players: []},
-             %Monopoly.Space{name: "Baltic Ave", players: ["nayeon"]},
-             %Monopoly.Space{name: "Vermont Ave", players: []},
-             %Monopoly.Space{name: "Connecticut Ave", players: []}
-           ]
+    assert Enum.at(game.board, 1).players == []
+    assert Enum.at(game.board, 2).players == ["nayeon"]
+    assert Enum.at(game.board, 2).name == "Community Chest"
   end
 
   test "move player to" do
@@ -98,13 +73,9 @@ defmodule MonopolyTest do
       Monopoly.assign_to_space(%Game{}, "nayeon", 1)
       |> Monopoly.move_player("nayeon", to: 2)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", players: [], type: :go},
-             %Monopoly.Space{name: "Mediterranean Ave", players: []},
-             %Monopoly.Space{name: "Baltic Ave", players: ["nayeon"]},
-             %Monopoly.Space{name: "Vermont Ave", players: []},
-             %Monopoly.Space{name: "Connecticut Ave", players: []}
-           ]
+    assert Enum.at(game.board, 1).players == []
+    assert Enum.at(game.board, 2).players == ["nayeon"]
+    assert Enum.at(game.board, 2).name == "Community Chest"
   end
 
   test "move player spaces" do
@@ -112,13 +83,10 @@ defmodule MonopolyTest do
       Monopoly.assign_to_space(%Game{}, "nayeon", 1)
       |> Monopoly.move_player("nayeon", spaces: 1)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", players: [], type: :go},
-             %Monopoly.Space{name: "Mediterranean Ave", players: []},
-             %Monopoly.Space{name: "Baltic Ave", players: ["nayeon"]},
-             %Monopoly.Space{name: "Vermont Ave", players: []},
-             %Monopoly.Space{name: "Connecticut Ave", players: []}
-           ]
+    assert Enum.at(game.board, 1).players == []
+    assert Enum.at(game.board, 2).players == ["nayeon"]
+    assert Enum.at(game.board, 2).name == "Community Chest"
+    assert game.history == ["nayeon lands on Community Chest"]
   end
 
   test "move player spaces 2" do
@@ -126,24 +94,27 @@ defmodule MonopolyTest do
       Monopoly.assign_to_space(%Game{}, "nayeon", 1)
       |> Monopoly.move_player("nayeon", spaces: 3)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", players: [], type: :go},
-             %Monopoly.Space{name: "Mediterranean Ave", players: []},
-             %Monopoly.Space{name: "Baltic Ave", players: []},
-             %Monopoly.Space{name: "Vermont Ave", players: []},
-             %Monopoly.Space{name: "Connecticut Ave", players: ["nayeon"]}
-           ]
+    assert Enum.at(game.board, 1).players == []
+    assert Enum.at(game.board, 4).players == ["nayeon"]
+    assert Enum.at(game.board, 4).name == "Income Tax (pay $200)"
+    assert game.history == ["nayeon lands on Income Tax (pay $200)"]
   end
 
   test "move player spaces wrap around", state do
-    game = Monopoly.move_player(state.game, "nayeon", spaces: 5)
+    game =
+      state.game
+      |> Monopoly.remove_from_space("nayeon", 0)
+      |> Monopoly.assign_to_space("nayeon", 35)
+      |> Monopoly.move_player("nayeon", spaces: 7)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", players: ["nayeon", "momo", "tzuyu"], type: :go},
-             %Monopoly.Space{name: "Mediterranean Ave", players: []},
-             %Monopoly.Space{name: "Baltic Ave", players: []},
-             %Monopoly.Space{name: "Vermont Ave", players: []},
-             %Monopoly.Space{name: "Connecticut Ave", players: []}
+    assert Enum.at(game.board, 35).players == []
+    assert Enum.at(game.board, 2).players == ["nayeon"]
+    assert Enum.at(game.board, 2).name == "Community Chest"
+
+    assert game.history == [
+             "nayeon lands on Community Chest",
+             "nayeon passes Go, collects $200",
+             "Game begins with nayeon, tzuyu, momo!"
            ]
   end
 
@@ -157,38 +128,41 @@ defmodule MonopolyTest do
 
   test "perform_move", state do
     game =
-      Monopoly.assign_to_space(state.game, "nayeon", 1)
-      |> Monopoly.perform_move("nayeon", spaces: 4)
+      state.game
+      |> Monopoly.perform_move("nayeon", spaces: 8)
 
-    assert game.board == [
-             %Monopoly.Space{name: "Go", type: :go, players: ["momo", "tzuyu"]},
-             %Monopoly.Space{name: "Mediterranean Ave", players: [], type: nil},
-             %Monopoly.Space{name: "Baltic Ave", type: nil, players: ["nayeon"]},
-             %Monopoly.Space{name: "Vermont Ave", type: nil, players: ["nayeon"]},
-             %Monopoly.Space{name: "Connecticut Ave", players: [], type: nil}
-           ]
+    assert Enum.at(game.board, 0).players == ["momo", "tzuyu"]
+    assert Enum.at(game.board, 8).players == ["nayeon"]
+    assert Enum.at(game.board, 2).name == "Community Chest"
 
     assert game.history == [
-             "nayeon lands on Baltic Ave",
-             "nayeon moves 4 spaces",
+             "nayeon lands on Vermont Avenue",
+             "nayeon moves 8 spaces",
              "Game begins with nayeon, tzuyu, momo!"
            ]
   end
 
   test "passes Go", state do
-    game = Monopoly.perform_move(state.game, "nayeon", spaces: 6)
+    game =
+      state.game
+      |> Monopoly.remove_from_space("nayeon", 0)
+      |> Monopoly.assign_to_space("nayeon", 35)
+      |> Monopoly.move_player("nayeon", spaces: 7)
+
+    assert Enum.at(game.board, 35).players == []
+    assert Enum.at(game.board, 2).players == ["nayeon"]
+    assert Enum.at(game.board, 2).name == "Community Chest"
 
     assert game.history == [
-             "nayeon lands on Mediterranean Ave",
+             "nayeon lands on Community Chest",
              "nayeon passes Go, collects $200",
-             "nayeon moves 6 spaces",
              "Game begins with nayeon, tzuyu, momo!"
            ]
 
-    assert game.players == [
-             %Monopoly.Player{money: 1700, name: "nayeon"},
-             %Monopoly.Player{money: 1500, name: "tzuyu"},
-             %Monopoly.Player{money: 1500, name: "momo"}
+    assert Enum.map(game.players, fn player -> {player.name, player.money} end) == [
+             {"nayeon", 1700},
+             {"tzuyu", 1500},
+             {"momo", 1500}
            ]
   end
 
@@ -196,7 +170,7 @@ defmodule MonopolyTest do
     game = Monopoly.assign_to_space(%Game{}, "nayeon", 1)
 
     assert Monopoly.find_player_on_board(game, "nayeon") == %Monopoly.Space{
-             name: "Mediterranean Ave",
+             name: "Mediterranean Avenue",
              players: ["nayeon"]
            }
   end
