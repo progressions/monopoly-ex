@@ -213,4 +213,14 @@ defmodule MonopolyTest do
              %Monopoly.Player{money: 1500, name: "momo"}
            ]
   end
+
+  test "pay_money", state do
+    game = Monopoly.pay_money(state.game, "nayeon", 200)
+
+    assert game.players == [
+             %Monopoly.Player{money: 1300, name: "nayeon"},
+             %Monopoly.Player{money: 1500, name: "tzuyu"},
+             %Monopoly.Player{money: 1500, name: "momo"}
+           ]
+  end
 end
