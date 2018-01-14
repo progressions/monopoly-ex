@@ -91,13 +91,13 @@ defmodule MonopolyTest do
 
   test "move player spaces 2" do
     game =
-      Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-      |> Monopoly.move_player("nayeon", spaces: 3)
+      Monopoly.assign_to_space(%Game{players: [%Player{name: "nayeon"}]}, "nayeon", 1)
+      |> Monopoly.move_player("nayeon", spaces: 4)
 
     assert Enum.at(game.board, 1).players == []
-    assert Enum.at(game.board, 4).players == ["nayeon"]
-    assert Enum.at(game.board, 4).name == "Income Tax (pay $200)"
-    assert game.history == ["nayeon lands on Income Tax (pay $200)"]
+    assert Enum.at(game.board, 5).players == ["nayeon"]
+    assert Enum.at(game.board, 5).name == "Reading Railroad"
+    assert game.history == ["nayeon lands on Reading Railroad"]
   end
 
   test "move player spaces wrap around", state do
@@ -164,6 +164,24 @@ defmodule MonopolyTest do
              {"tzuyu", 1500},
              {"momo", 1500}
            ]
+  end
+
+  test "lands on Income Tax", state do
+    game =
+      state.game
+      |> Monopoly.perform_move("nayeon", spaces: 4)
+
+    assert Enum.at(game.board, 0).players == ["momo", "tzuyu"]
+    assert Enum.at(game.board, 4).players == ["nayeon"]
+    assert Enum.at(game.board, 4).name == "Income Tax (pay $200)"
+
+    assert game.history == [
+             "nayeon lands on Income Tax (pay $200)",
+             "nayeon moves 4 spaces",
+             "Game begins with nayeon, tzuyu, momo!"
+           ]
+
+    assert [%Player{money: 1300, name: "nayeon"} | _] = game.players
   end
 
   test "find_player_on_board" do

@@ -110,7 +110,7 @@ defmodule Monopoly do
     space = find_player_on_board(game, player)
 
     game
-    |> log("#{player} lands on #{space.name}")
+    |> land_on(player, space)
   end
 
   def move_player(game, player, spaces: spaces) do
@@ -133,6 +133,17 @@ defmodule Monopoly do
     |> Monopoly.assign_to_space(player, to)
   end
 
+  def land_on(game, name, %Space{type: :income_tax} = space) do
+    game
+    |> pay_money(name, 200)
+    |> log("#{name} lands on #{space.name}")
+  end
+
+  def land_on(game, name, space) do
+    game
+    |> log("#{name} lands on #{space.name}")
+  end
+
   def traverse(game, name, to) when is_integer(to) do
     space = space_at(game, to)
     traverse(game, name, space)
@@ -152,6 +163,8 @@ defmodule Monopoly do
 
     %{game | players: players}
   end
+
+  def pay_money(game, name, amount), do: add_money(game, name, 0 - amount)
 
   def space_at(game, index) do
     Enum.at(game.board, index)
