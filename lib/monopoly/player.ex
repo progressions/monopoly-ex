@@ -1,5 +1,5 @@
 defmodule Monopoly.Player do
-  alias Monopoly.{Log, Space}
+  alias Monopoly.{Game, Space}
 
   defstruct [
     :name,
@@ -15,7 +15,7 @@ defmodule Monopoly.Player do
 
   def perform_move(game, player, spaces: spaces) do
     game
-    |> Log.log("#{player} moves #{spaces} spaces")
+    |> Game.log("#{player} moves #{spaces} spaces")
     |> move_player(player, spaces: spaces)
   end
 

@@ -177,7 +177,12 @@ defmodule MonopolyTest do
 
   test "advance_next_player", state do
     assert {"tzuyu", _} =
-             state.game |> Monopoly.advance_next_player()
-             |> Monopoly.next_player()
+             state.game |> Monopoly.Game.advance_next_player()
+             |> Monopoly.Game.next_player()
+
+    assert {"momo", _} =
+             state.game |> Monopoly.Game.advance_next_player()
+             |> Monopoly.Game.advance_next_player()
+             |> Monopoly.Game.next_player()
   end
 end

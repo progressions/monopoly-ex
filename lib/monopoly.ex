@@ -3,7 +3,7 @@ defmodule Monopoly do
   Documentation for Monopoly.
   """
 
-  alias Monopoly.{Game, Log, Player, Space}
+  alias Monopoly.{Game, Player, Space}
 
   @doc """
   Initialize a new game with a set of players.
@@ -16,18 +16,12 @@ defmodule Monopoly do
     players = Enum.map(player_names, &{&1, %Player{name: &1}})
 
     %Game{players: players}
-    |> Log.log("Game begins with #{Enum.join(player_names, ", ")}!")
+    |> Game.log("Game begins with #{Enum.join(player_names, ", ")}!")
   end
 
   def new do
     init(players: ["nayeon", "tzuyu", "momo"])
   end
-
-  def advance_next_player(%Game{players: [first | tail]} = game) do
-    %{game | players: List.flatten(tail, [first])}
-  end
-
-  def next_player(%Game{players: [first | _]}), do: first
 
   defp roll_dice do
     a = :rand.uniform(6)

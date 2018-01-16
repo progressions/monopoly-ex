@@ -1,5 +1,5 @@
 defmodule Monopoly.Game do
-  alias Monopoly.Space
+  alias Monopoly.{Game, Space}
 
   defstruct spaces: [
               %Space{name: "Go (collect $200)", type: :go},
@@ -45,4 +45,14 @@ defmodule Monopoly.Game do
             ],
             history: [],
             players: []
+
+  def log(game, message) do
+    %{game | history: [message | game.history]}
+  end
+
+  def advance_next_player(%Game{players: [first | tail]} = game) do
+    %{game | players: List.flatten(tail, [first])}
+  end
+
+  def next_player(%Game{players: [first | _]}), do: first
 end
