@@ -33,10 +33,6 @@ defmodule Monopoly do
     :rand.uniform(6) + :rand.uniform(6)
   end
 
-  def space_at(game, index) do
-    Enum.at(game.spaces, index)
-  end
-
   @doc """
   Finds the player's destination after moving a given number of spaces along the board.
 
