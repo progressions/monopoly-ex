@@ -174,4 +174,10 @@ defmodule MonopolyTest do
 
     assert player.money == 1300
   end
+
+  test "advance_next_player", state do
+    assert {"tzuyu", _} =
+             state.game |> Monopoly.advance_next_player()
+             |> Monopoly.next_player()
+  end
 end
