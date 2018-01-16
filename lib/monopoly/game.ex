@@ -1,7 +1,7 @@
 defmodule Monopoly.Game do
   alias Monopoly.{Game, Space}
 
-  defstruct spaces: [
+  defstruct spaces: {
               %Space{name: "Go (collect $200)", type: :go},
               %Space{name: "Mediterranean Avenue"},
               %Space{name: "Community Chest", type: :community_chest},
@@ -42,7 +42,7 @@ defmodule Monopoly.Game do
               %Space{name: "Park Place"},
               %Space{name: "Luxury Tax (pay $100)", type: :luxury_tax},
               %Space{name: "Boardwalk"}
-            ],
+            },
             history: [],
             players: []
 

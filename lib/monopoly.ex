@@ -37,20 +37,20 @@ defmodule Monopoly do
 
   ## Examples
 
-      iex> Monopoly.destination_index([0,1,2,3,4,5], 1, 1)
+      iex> Monopoly.destination_index({0,1,2,3,4,5}, 1, 1)
       2
 
-      iex> Monopoly.destination_index([0,1,2,3,4,5], 1, 4)
+      iex> Monopoly.destination_index({0,1,2,3,4,5}, 1, 4)
       5
 
-      iex> Monopoly.destination_index([0,1,2,3,4,5], 1, 5)
+      iex> Monopoly.destination_index({0,1,2,3,4,5}, 1, 5)
       0
 
-      iex> Monopoly.destination_index([0,1,2,3,4,5], 1, 12)
+      iex> Monopoly.destination_index({0,1,2,3,4,5}, 1, 12)
       1
   """
   def destination_index(board, index, spaces) do
-    len = length(board)
+    len = tuple_size(board)
     result = index + spaces
 
     if result > len - 1 do

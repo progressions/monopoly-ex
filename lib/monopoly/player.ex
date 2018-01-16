@@ -21,7 +21,7 @@ defmodule Monopoly.Player do
 
   def move_player(game, name, spaces: 0) do
     player = find(game, name)
-    space = Enum.at(game.spaces, player.index)
+    space = elem(game.spaces, player.index)
 
     Space.land_on(game, player.name, space)
   end
