@@ -91,6 +91,24 @@ defmodule MonopolyTest do
            ]
   end
 
+  test "move player spaces wrap around twice if necessary", state do
+    game =
+      state.game
+      |> Monopoly.Player.move_player("nayeon", to: 35)
+      |> Monopoly.Player.move_player("nayeon", spaces: 47)
+
+    {{"nayeon", player}, _} = List.keytake(game.players, "nayeon", 0)
+
+    assert player.index == 2
+
+    assert game.history == [
+             "nayeon lands on Community Chest",
+             "nayeon passes Go, collects $200",
+             "nayeon passes Go, collects $200",
+             "Game begins with nayeon, tzuyu, momo!"
+           ]
+  end
+
   test "Player.perform_move", state do
     game =
       state.game

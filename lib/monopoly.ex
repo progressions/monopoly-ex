@@ -59,7 +59,7 @@ defmodule Monopoly do
     result = index + spaces
 
     if result > len - 1 do
-      result - len
+      destination_index(board, 0, result - len)
     else
       result
     end

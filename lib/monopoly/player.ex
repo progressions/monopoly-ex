@@ -52,5 +52,4 @@ defmodule Monopoly.Player do
   end
 
   def pay_money(game, name, amount), do: add_money(game, name, 0 - amount)
-
 end
