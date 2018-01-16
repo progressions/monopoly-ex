@@ -53,6 +53,8 @@ defmodule Monopoly do
       iex> Monopoly.destination_index([0,1,2,3,4,5], 1, 5)
       0
 
+      iex> Monopoly.destination_index([0,1,2,3,4,5], 1, 12)
+      1
   """
   def destination_index(board, index, spaces) do
     len = length(board)
