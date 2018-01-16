@@ -30,7 +30,10 @@ defmodule Monopoly do
   def next_player(%Game{players: [first | _]}), do: first
 
   defp roll_dice do
-    :rand.uniform(6) + :rand.uniform(6)
+    a = :rand.uniform(6)
+    b = :rand.uniform(6)
+
+    if a == b, do: {:doubles, a+b}, else: {:ok, a+b}
   end
 
   @doc """
