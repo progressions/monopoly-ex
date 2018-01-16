@@ -27,7 +27,7 @@ defmodule Monopoly do
     a = :rand.uniform(6)
     b = :rand.uniform(6)
 
-    if a == b, do: {:doubles, a+b}, else: {:ok, a+b}
+    if a == b, do: {:doubles, a + b}, else: {:ok, a + b}
   end
 
   @doc """

@@ -181,7 +181,8 @@ defmodule MonopolyTest do
              |> Monopoly.Game.next_player()
 
     assert {"momo", _} =
-             state.game |> Monopoly.Game.advance_next_player()
+             state.game
+             |> Monopoly.Game.advance_next_player()
              |> Monopoly.Game.advance_next_player()
              |> Monopoly.Game.next_player()
   end
