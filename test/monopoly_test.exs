@@ -2,8 +2,6 @@ defmodule MonopolyTest do
   use ExUnit.Case
   doctest Monopoly
 
-  alias Monopoly.{Game, Space, Player}
-
   setup do
     game = Monopoly.init(players: ["nayeon", "tzuyu", "momo"])
 
@@ -15,101 +13,76 @@ defmodule MonopolyTest do
 
     assert game.history == ["Game begins with nayeon, tzuyu, momo!"]
 
-    assert game.players == [
-             %Player{name: "nayeon"},
-             %Player{name: "tzuyu"},
-             %Player{name: "momo"}
+    assert Enum.map(game.players, fn {_name, player} -> player.name end) == [
+             "nayeon",
+             "tzuyu",
+             "momo"
            ]
   end
 
-  test "assign to space 1" do
-    game = Monopoly.assign_to_space(%Game{}, "nayeon", 1)
+  test "assign to space 1", state do
+    game = Monopoly.Player.move_player(state.game, "nayeon", to: 1)
 
-    assert Enum.at(game.board, 1).players == ["nayeon"]
-    assert Enum.at(game.board, 1).name == "Mediterranean Avenue"
+    {{"nayeon", player}, _} = List.keytake(game.players, "nayeon", 0)
+
+    assert player.index == 1
   end
 
-  test "assign to space 2" do
-    game = Monopoly.assign_to_space(%Game{}, "nayeon", 2)
+  test "assign to space 2", state do
+    game = Monopoly.Player.move_player(state.game, "nayeon", to: 2)
 
-    assert Enum.at(game.board, 0).players == []
-    assert Enum.at(game.board, 2).players == ["nayeon"]
-    assert Enum.at(game.board, 2).name == "Community Chest"
+    {{"nayeon", player}, _} = List.keytake(game.players, "nayeon", 0)
+
+    assert player.index == 2
   end
 
-  test "assign to space 3" do
+  test "assign to space 3", state do
+    game = Monopoly.Player.move_player(state.game, "nayeon", to: 3)
+
+    {{"nayeon", player}, _} = List.keytake(game.players, "nayeon", 0)
+
+    assert player.index == 3
+  end
+
+  test "move player spaces", state do
     game =
-      Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-      |> Monopoly.assign_to_space("nayeon", 2)
+      Monopoly.Player.move_player(state.game, "nayeon", to: 1)
+      |> Monopoly.Player.move_player("nayeon", spaces: 1)
 
-    assert Enum.at(game.board, 1).players == ["nayeon"]
-    assert Enum.at(game.board, 2).players == ["nayeon"]
-    assert Enum.at(game.board, 2).name == "Community Chest"
+    {{"nayeon", player}, _} = List.keytake(game.players, "nayeon", 0)
+
+    assert player.index == 2
+
+    assert game.history == [
+             "nayeon lands on Community Chest",
+             "Game begins with nayeon, tzuyu, momo!"
+           ]
   end
 
-  test "remove from space 1" do
+  test "move player spaces 2", state do
     game =
-      Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-      |> Monopoly.remove_from_space("nayeon", 1)
-      |> Monopoly.assign_to_space("nayeon", 2)
+      Monopoly.Player.move_player(state.game, "nayeon", to: 1)
+      |> Monopoly.Player.move_player("nayeon", spaces: 4)
 
-    assert Enum.at(game.board, 1).players == []
-    assert Enum.at(game.board, 2).players == ["nayeon"]
-    assert Enum.at(game.board, 2).name == "Community Chest"
-  end
+    {{"nayeon", player}, _} = List.keytake(game.players, "nayeon", 0)
 
-  test "move player from to" do
-    game =
-      Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-      |> Monopoly.move_player("nayeon", from: 1, to: 2)
+    assert player.index == 5
 
-    assert Enum.at(game.board, 1).players == []
-    assert Enum.at(game.board, 2).players == ["nayeon"]
-    assert Enum.at(game.board, 2).name == "Community Chest"
-  end
-
-  test "move player to" do
-    game =
-      Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-      |> Monopoly.move_player("nayeon", to: 2)
-
-    assert Enum.at(game.board, 1).players == []
-    assert Enum.at(game.board, 2).players == ["nayeon"]
-    assert Enum.at(game.board, 2).name == "Community Chest"
-  end
-
-  test "move player spaces" do
-    game =
-      Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-      |> Monopoly.move_player("nayeon", spaces: 1)
-
-    assert Enum.at(game.board, 1).players == []
-    assert Enum.at(game.board, 2).players == ["nayeon"]
-    assert Enum.at(game.board, 2).name == "Community Chest"
-    assert game.history == ["nayeon lands on Community Chest"]
-  end
-
-  test "move player spaces 2" do
-    game =
-      Monopoly.assign_to_space(%Game{players: [%Player{name: "nayeon"}]}, "nayeon", 1)
-      |> Monopoly.move_player("nayeon", spaces: 4)
-
-    assert Enum.at(game.board, 1).players == []
-    assert Enum.at(game.board, 5).players == ["nayeon"]
-    assert Enum.at(game.board, 5).name == "Reading Railroad"
-    assert game.history == ["nayeon lands on Reading Railroad"]
+    assert game.history == [
+             "nayeon lands on Reading Railroad",
+             "Game begins with nayeon, tzuyu, momo!"
+           ]
   end
 
   test "move player spaces wrap around", state do
     game =
       state.game
-      |> Monopoly.remove_from_space("nayeon", 0)
-      |> Monopoly.assign_to_space("nayeon", 35)
-      |> Monopoly.move_player("nayeon", spaces: 7)
+      |> Monopoly.Player.move_player("nayeon", to: 35)
+      |> Monopoly.Player.move_player("nayeon", spaces: 7)
 
-    assert Enum.at(game.board, 35).players == []
-    assert Enum.at(game.board, 2).players == ["nayeon"]
-    assert Enum.at(game.board, 2).name == "Community Chest"
+    {{"nayeon", player}, _} = List.keytake(game.players, "nayeon", 0)
+
+    assert player.index == 2
 
     assert game.history == [
              "nayeon lands on Community Chest",
@@ -118,22 +91,32 @@ defmodule MonopolyTest do
            ]
   end
 
-  test "player_index" do
-    game = Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-    assert Monopoly.player_index(game.board, "nayeon") == 1
-
-    game = Monopoly.move_player(game, "nayeon", to: 3)
-    assert Monopoly.player_index(game.board, "nayeon") == 3
-  end
-
-  test "perform_move", state do
+  test "move player spaces wrap around twice if necessary", state do
     game =
       state.game
-      |> Monopoly.perform_move("nayeon", spaces: 8)
+      |> Monopoly.Player.move_player("nayeon", to: 35)
+      |> Monopoly.Player.move_player("nayeon", spaces: 47)
 
-    assert Enum.at(game.board, 0).players == ["momo", "tzuyu"]
-    assert Enum.at(game.board, 8).players == ["nayeon"]
-    assert Enum.at(game.board, 2).name == "Community Chest"
+    {{"nayeon", player}, _} = List.keytake(game.players, "nayeon", 0)
+
+    assert player.index == 2
+
+    assert game.history == [
+             "nayeon lands on Community Chest",
+             "nayeon passes Go, collects $200",
+             "nayeon passes Go, collects $200",
+             "Game begins with nayeon, tzuyu, momo!"
+           ]
+  end
+
+  test "Player.perform_move", state do
+    game =
+      state.game
+      |> Monopoly.Player.perform_move("nayeon", spaces: 8)
+
+    {{"nayeon", player}, _} = List.keytake(game.players, "nayeon", 0)
+
+    assert player.index == 8
 
     assert game.history == [
              "nayeon lands on Vermont Avenue",
@@ -145,82 +128,62 @@ defmodule MonopolyTest do
   test "passes Go", state do
     game =
       state.game
-      |> Monopoly.remove_from_space("nayeon", 0)
-      |> Monopoly.assign_to_space("nayeon", 35)
-      |> Monopoly.move_player("nayeon", spaces: 7)
+      |> Monopoly.Player.move_player("nayeon", to: 35)
+      |> Monopoly.Player.move_player("nayeon", spaces: 7)
 
-    assert Enum.at(game.board, 35).players == []
-    assert Enum.at(game.board, 2).players == ["nayeon"]
-    assert Enum.at(game.board, 2).name == "Community Chest"
+    player = Monopoly.Player.find(game, "nayeon")
+
+    assert player.index == 2
+    assert player.money == 1700
 
     assert game.history == [
              "nayeon lands on Community Chest",
              "nayeon passes Go, collects $200",
              "Game begins with nayeon, tzuyu, momo!"
            ]
-
-    assert Enum.map(game.players, fn player -> {player.name, player.money} end) == [
-             {"nayeon", 1700},
-             {"tzuyu", 1500},
-             {"momo", 1500}
-           ]
   end
 
   test "lands on Income Tax", state do
     game =
       state.game
-      |> Monopoly.perform_move("nayeon", spaces: 4)
+      |> Monopoly.Player.perform_move("nayeon", spaces: 4)
 
-    assert Enum.at(game.board, 0).players == ["momo", "tzuyu"]
-    assert Enum.at(game.board, 4).players == ["nayeon"]
-    assert Enum.at(game.board, 4).name == "Income Tax (pay $200)"
+    player = Monopoly.Player.find(game, "nayeon")
+
+    assert player.money == 1300
 
     assert game.history == [
              "nayeon lands on Income Tax (pay $200)",
              "nayeon moves 4 spaces",
              "Game begins with nayeon, tzuyu, momo!"
            ]
-
-    assert [%Player{money: 1300, name: "nayeon"} | _] = game.players
-  end
-
-  test "find_player_on_board" do
-    game = Monopoly.assign_to_space(%Game{}, "nayeon", 1)
-
-    assert Monopoly.find_player_on_board(game, "nayeon") == %Monopoly.Space{
-             name: "Mediterranean Avenue",
-             players: ["nayeon"]
-           }
-  end
-
-  test "find_player", state do
-    assert Monopoly.find_player(state.game.players, "nayeon") ==
-             {0, %Player{money: 1500, name: "nayeon"}}
-  end
-
-  test "find_player when the player doesn't exist", state do
-    assert_raise RuntimeError, "Player dubu does not exist in [nayeon, tzuyu, momo]", fn ->
-      Monopoly.find_player(state.game.players, "dubu") == {nil, nil}
-    end
   end
 
   test "add_money", state do
-    game = Monopoly.add_money(state.game, "nayeon", 200)
+    player =
+      Monopoly.Player.add_money(state.game, "nayeon", 200)
+      |> Monopoly.Player.find("nayeon")
 
-    assert game.players == [
-             %Monopoly.Player{money: 1700, name: "nayeon"},
-             %Monopoly.Player{money: 1500, name: "tzuyu"},
-             %Monopoly.Player{money: 1500, name: "momo"}
-           ]
+    assert player.money == 1700
   end
 
   test "pay_money", state do
-    game = Monopoly.pay_money(state.game, "nayeon", 200)
+    player =
+      Monopoly.Player.pay_money(state.game, "nayeon", 200)
+      |> Monopoly.Player.find("nayeon")
 
-    assert game.players == [
-             %Monopoly.Player{money: 1300, name: "nayeon"},
-             %Monopoly.Player{money: 1500, name: "tzuyu"},
-             %Monopoly.Player{money: 1500, name: "momo"}
-           ]
+    assert player.money == 1300
+  end
+
+  test "advance_next_player", state do
+    assert {"tzuyu", _} =
+             state.game |> Monopoly.Game.advance_next_player()
+             |> Monopoly.Game.next_player()
+
+    assert {"momo", _} =
+             state.game
+             |> Monopoly.Game.advance_next_player()
+             |> Monopoly.Game.advance_next_player()
+             |> Monopoly.Game.next_player()
   end
 end
