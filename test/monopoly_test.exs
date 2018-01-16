@@ -141,14 +141,6 @@ defmodule MonopolyTest do
            ]
   end
 
-  test "find_player_on_board", state do
-    game = Monopoly.Player.move_player(state.game, "nayeon", to: 1)
-
-    assert Monopoly.find_player_on_board(game, "nayeon") == %Monopoly.Space{
-             name: "Mediterranean Avenue"
-           }
-  end
-
   test "add_money", state do
     player =
       Monopoly.Player.add_money(state.game, "nayeon", 200)

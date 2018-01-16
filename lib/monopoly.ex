@@ -64,9 +64,4 @@ defmodule Monopoly do
       result
     end
   end
-
-  def find_player_on_board(game, name) do
-    player = Player.find(game, name)
-    Enum.at(game.spaces, player.index)
-  end
 end
